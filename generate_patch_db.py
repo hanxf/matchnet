@@ -1,12 +1,19 @@
-"""This script creates a leveldb  database for a given UBC patch dataset.
+"""This script creates a leveldb database for a given UBC patch dataset. For
+each patch we generate a key-value pair:
+    key: the patch id (zero-starting line index in the info.txt file).
+  value: a Caffe Datum containing the image patch and the metadata.
 
-   Example:
-     python generate_patch_db.py data/phototour/liberty/info.txt \
-       data/phototour/liberty/interest.txt \
-       data/phototour/liberty data/leveldb/liberty.leveldb
+It creates a new leveldb with the given name and generates error if it already
+exists.
+
+Example:
+  python generate_patch_db.py data/phototour/liberty/info.txt \
+    data/phototour/liberty/interest.txt \
+    data/phototour/liberty data/leveldb/liberty.leveldb
+
 """
 
-import math, leveldb, numpy as np, skimage
+import leveldb, numpy as np, skimage
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from caffe.proto import caffe_pb2
 from caffe.io import *
@@ -30,6 +37,9 @@ def ParseArgs():
 
 # yapf: disable
 def GetPatchImage(patch_id, container_dir):
+    """Returns a 64 x 64 patch with the given patch_id. Catch container images to
+       reduce loading from disk.
+    """
     # Define constants. Each container image is of size 1024x1024. It packs at
     # most 16 rows and 16 columns of 64x64 patches, arranged from left to right,
     # top to bottom.
@@ -71,7 +81,7 @@ def main():
     db = leveldb.LevelDB(args.output_db,
                          create_if_missing=True,
                          error_if_exists=True)
-    # Add each patch to the database
+    # Add patches to the database in batch.
     batch = leveldb.WriteBatch()
     total = len(interest)
     processed = 0
