@@ -46,20 +46,23 @@ def GetPatchImage(patch_id, container_dir):
     PATCHES_PER_IMAGE = 16 * 16
     PATCHES_PER_ROW = 16
     PATCH_SIZE = 64
+
     # Calculate the container index, the row and column index for the given
     # patch.
     container_idx, container_offset = divmod(patch_id, PATCHES_PER_IMAGE)
     row_idx, col_idx = divmod(container_offset, PATCHES_PER_ROW)
+
     # Read the container image if it is not cached.
     if GetPatchImage.cached_container_idx != container_idx:
         GetPatchImage.cached_container_idx = container_idx
         GetPatchImage.cached_container_img = skimage.img_as_ubyte(
             skimage.io.imread('%s/patches%04d.bmp' % (
                 container_dir, container_idx), as_grey=True))
+
     # Extract the patch from the image and return.
     patch_image = GetPatchImage.cached_container_img[
         PATCH_SIZE * row_idx:PATCH_SIZE * (row_idx + 1),
-        PATCH_SIZE * col_idx:PATCH_SIZE * (row_idx + 1)]
+        PATCH_SIZE * col_idx:PATCH_SIZE * (col_idx + 1)]
     return patch_image
 # yapf: enable
 GetPatchImage.cached_container_idx = None
@@ -69,18 +72,22 @@ GetPatchImage.cached_container_img = None
 def main():
     # Parse input arguments.
     args = ParseArgs()
+
     # Read the 3Dpoint IDs from the info file.
     with open(args.info_file) as f:
         point_id = [int(line.split()[0]) for line in f]
+
     # Read the interest point from the interest file. The fields in each line
     # are: image_id, x, y, orientation, and scale. We parse all of them as float
     # even though image_id is integer.
     with open(args.interest_file) as f:
         interest = [[float(x) for x in line.split()] for line in f]
+
     # Create the output database, fail if exists.
     db = leveldb.LevelDB(args.output_db,
                          create_if_missing=True,
                          error_if_exists=True)
+
     # Add patches to the database in batch.
     batch = leveldb.WriteBatch()
     total = len(interest)
@@ -88,22 +95,28 @@ def main():
     for i, metadata in enumerate(interest):
         datum = caffe_pb2.Datum()
         datum.channels, datum.height, datum.width = (1, 64, 64)
+
         # Extract the patch
         datum.data = GetPatchImage(i, args.container_dir).tostring()
+
         # Write 3D point ID into the label field.
         datum.label = point_id[i]
+
         # Write other metadata into float_data fields.
         datum.float_data.extend(metadata)
         batch.Put(str(i), datum.SerializeToString())
         processed += 1
         if processed % 1000 == 0:
             print processed, '/', total
+
             # Write the current batch.
             db.Write(batch, sync=True)
+
             # Verify the last written record.
             d = caffe_pb2.Datum()
             d.ParseFromString(db.Get(str(processed - 1)))
             assert (d.data == datum.data)
+
             # Start a new batch
             batch = leveldb.WriteBatch()
     db.Write(batch, sync=True)
