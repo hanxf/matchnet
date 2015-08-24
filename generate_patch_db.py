@@ -3,8 +3,7 @@ each patch we generate a key-value pair:
     key: the patch id (zero-starting line index in the info.txt file).
   value: a Caffe Datum containing the image patch and the metadata.
 
-It creates a new leveldb with the given name and generates error if it already
-exists.
+It will complain if the specified db already exists.
 
 Example:
   python generate_patch_db.py data/phototour/liberty/info.txt \
@@ -35,7 +34,6 @@ def ParseArgs():
     return args
 
 
-# yapf: disable
 def GetPatchImage(patch_id, container_dir):
     """Returns a 64 x 64 patch with the given patch_id. Catch container images to
        reduce loading from disk.
@@ -55,16 +53,17 @@ def GetPatchImage(patch_id, container_dir):
     # Read the container image if it is not cached.
     if GetPatchImage.cached_container_idx != container_idx:
         GetPatchImage.cached_container_idx = container_idx
-        GetPatchImage.cached_container_img = skimage.img_as_ubyte(
-            skimage.io.imread('%s/patches%04d.bmp' % (
-                container_dir, container_idx), as_grey=True))
+        GetPatchImage.cached_container_img = \
+            skimage.img_as_ubyte(skimage.io.imread('%s/patches%04d.bmp' % \
+                (container_dir, container_idx), as_grey=True))
 
     # Extract the patch from the image and return.
-    patch_image = GetPatchImage.cached_container_img[
-        PATCH_SIZE * row_idx:PATCH_SIZE * (row_idx + 1),
+    patch_image = GetPatchImage.cached_container_img[ \
+        PATCH_SIZE * row_idx:PATCH_SIZE * (row_idx + 1), \
         PATCH_SIZE * col_idx:PATCH_SIZE * (col_idx + 1)]
     return patch_image
-# yapf: enable
+
+# Static variables initialization for GetPatchImage.
 GetPatchImage.cached_container_idx = None
 GetPatchImage.cached_container_img = None
 
