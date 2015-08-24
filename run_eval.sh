@@ -2,7 +2,7 @@
 
 TRAIN_DATASET=$1
 TEST_DATASET=$2
-BASE_DIR=/Users/solarapex/repos/matchnet
+BASE_DIR=./
 MODEL_DIR=$BASE_DIR/models
 MODEL_NAME="${TRAIN_DATASET}_r_0.01_m_0"
 TEST_DB=$BASE_DIR/data/leveldb/${TEST_DATASET}.leveldb
