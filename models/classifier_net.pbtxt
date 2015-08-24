@@ -1,0 +1,50 @@
+name: "classify_tower"
+layers {
+  bottom: "input"
+  top: "fc1"
+  name: "fc1"
+  type: INNER_PRODUCT
+  inner_product_param {
+    num_output: 1024
+  }
+}
+layers {
+  bottom: "fc1"
+  top: "fc1"
+  name: "fc1_relu"
+  type: RELU
+}
+layers {
+  bottom: "fc1"
+  top: "fc2"
+  name: "fc2"
+  type: INNER_PRODUCT
+  inner_product_param {
+    num_output: 1024
+  }
+}
+layers {
+  bottom: "fc2"
+  top: "fc2"
+  name: "fc2_relu"
+  type: RELU
+}
+layers {
+  bottom: "fc2"
+  top: "fc3"
+  name: "fc3"
+  type: INNER_PRODUCT
+  inner_product_param {
+    num_output: 2
+  }
+}
+layers {
+  bottom: "fc3"
+  top: "prob"
+  type: SOFTMAX
+}
+input: "input"
+input_dim: 1024
+input_dim: 8192
+input_dim: 1
+input_dim: 1
