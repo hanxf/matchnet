@@ -88,16 +88,17 @@ def ReadPatches(db, pairs, patch_height=64, patch_width=64):
 
 def main():
     args = ParseArgs()
+
     # Initialize networks.
     feature_net = FeatureNet(args.feature_net_model, args.feature_net_params)
     metric_net = MetricNet(args.metric_net_model, args.metric_net_params)
 
+    caffe.set_phase_test()
     if args.use_gpu:
-        caffe.set_mode_gpu
-        caffe.set_device(args.gpu_id)
-        print "GPU mode, gpu_id=%d" % (args.gpu_id)
+        caffe.set_mode_gpu()
+        print "GPU mode"
     else:
-        caffe.set_mode_cpu
+        caffe.set_mode_cpu()
         print "CPU mode"
 
     # Read the test pairs.
@@ -123,7 +124,7 @@ def main():
         feats = [feature_net.ComputeFeature(input_patches[0]),
                  feature_net.ComputeFeature(input_patches[1])]
 
-        # Compute scores.
+        # # Compute scores.
         scores[start_idx:stop_idx] = \
             metric_net.ComputeScore(feats[0], feats[1])
 
