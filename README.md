@@ -1,7 +1,7 @@
 # Matchnet
 
 Matchnet is a deep learning approach for patch-based local image matching, which
-learns both feature representation and a matching function from data. More
+jointly learns feature representation and matching function from data. More
 details about this approach can be found in our
 [CVPR'15 paper](http://www.cs.unc.edu/~xufeng/cs/papers/cvpr15-matchnet.pdf).
 
