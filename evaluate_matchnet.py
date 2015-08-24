@@ -93,7 +93,6 @@ def main():
     feature_net = FeatureNet(args.feature_net_model, args.feature_net_params)
     metric_net = MetricNet(args.metric_net_model, args.metric_net_params)
 
-    caffe.set_phase_test()
     if args.use_gpu:
         caffe.set_mode_gpu()
         print "GPU mode"
