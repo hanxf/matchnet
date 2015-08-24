@@ -62,7 +62,7 @@ class MetricNet(caffe.Net):
         in_ = np.concatenate((inputs1, inputs2), axis=1)
         out_ = self.forward_all(**{self.inputs[0]: in_})
         scores = out_[self.outputs[0]][:, 1]
-        return scores
+        return scores.flatten()
 
     def GetBatchSize(self):
         return self.batch_size_
