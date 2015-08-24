@@ -12,9 +12,9 @@ OUTPUT=/tmp/predictions.txt
 
 python evaluate_matchnet.py \
     $GPU_OPTIONS \
-    $MODEL_DIR/$MODEL_NAME.feature_net.pbtxt \
+    $MODEL_DIR/feature_net.pbtxt \
     $MODEL_DIR/$MODEL_NAME.feature_net.pb \
-    $MODEL_DIR/$MODEL_NAME.classifier_net.pbtxt \
+    $MODEL_DIR/classifier_net.pbtxt \
     $MODEL_DIR/$MODEL_NAME.classifier_net.pb \
     $TEST_DB \
     $TEST_PAIR \
