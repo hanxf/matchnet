@@ -30,6 +30,15 @@ def ParseArgs():
               'Two patches match if their point_id match.'))
     parser.add_argument('output_txt',
                         help='Result file containing the predictions.')
+    parser.add_argument('--use_gpu',
+                        action='store_true',
+                        dest='use_gpu',
+                        help=('Switch to use gpu.'))
+    parser.add_argument('--gpu_id',
+                        default=0,
+                        type=int,
+                        dest='gpu_id',
+                        help=('GPU id. Effective only when --use_gpu=True.'))
     args = parser.parse_args()
     return args
 
@@ -82,6 +91,14 @@ def main():
     # Initialize networks.
     feature_net = FeatureNet(args.feature_net_model, args.feature_net_params)
     metric_net = MetricNet(args.metric_net_model, args.metric_net_params)
+
+    if args.use_gpu:
+        caffe.set_mode_gpu
+        caffe.set_device(args.gpu_id)
+        print "GPU mode, gpu_id=%d" % (args.gpu_id)
+    else:
+        caffe.set_mode_cpu
+        print "CPU mode"
 
     # Read the test pairs.
     pairs, labels = ReadPairs(args.test_pairs)
